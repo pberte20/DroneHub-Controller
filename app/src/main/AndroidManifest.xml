@@ -41,7 +41,7 @@
         <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data
             android:name="com.dji.sdk.API_KEY"
-            android:value="Please use your own API Key" />
+            android:value="DJI API Key" />
         <activity
             android:name="dji.sdk.sdkmanager.DJIAoaControllerActivity"
             android:exported="true"
@@ -63,6 +63,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MainActivity"/>
     </application>
 
 
