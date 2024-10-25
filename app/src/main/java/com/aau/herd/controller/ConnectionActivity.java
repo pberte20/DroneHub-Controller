@@ -25,6 +25,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.aau.herd.controller.Socket.SocketConnection;
+import com.aau.herd.controller.Utils.Constants;
+import com.aau.herd.controller.Utils.Preferences;
+
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.log.DJILog;
@@ -43,6 +48,7 @@ public class ConnectionActivity extends Activity implements View.OnClickListener
     private TextView mVersionTv;
     private Button mBtnOpen;
     private EditText mEditIPAddress;
+    private EditText mEditPort;
     private Button mBtnSave;
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE,
@@ -221,9 +227,12 @@ public class ConnectionActivity extends Activity implements View.OnClickListener
         mTextProduct = (TextView) findViewById(R.id.text_product_info);
 
         mEditIPAddress = findViewById(R.id.edit_ip_address);
-        // Load the saved text from SharedPreferences
-        String savedText = Preferences.loadText(this);
-        mEditIPAddress.setText(savedText);
+        String savedIP = Preferences.loadText(this, Constants.IP_ADDRESS);
+        mEditIPAddress.setText(savedIP);
+
+        mEditPort = findViewById(R.id.edit_port);
+        String savedPort = Preferences.loadText(this, Constants.PORT);
+        mEditPort.setText(savedPort);
 
         mBtnOpen = (Button) findViewById(R.id.btn_open);
         mBtnOpen.setOnClickListener(this);
@@ -237,8 +246,10 @@ public class ConnectionActivity extends Activity implements View.OnClickListener
     }
 
     private void saveText() {
-        String textToSave = mEditIPAddress.getText().toString();
-        Preferences.saveText(this, textToSave);
+        String ipAddress = mEditIPAddress.getText().toString();
+        String port = mEditPort.getText().toString();
+        Preferences.saveText(this, Constants.IP_ADDRESS, ipAddress);
+        Preferences.saveText(this, Constants.PORT, port);
         showToast("IP Address Saved");
     }
 
@@ -281,8 +292,19 @@ public class ConnectionActivity extends Activity implements View.OnClickListener
     public void onClick(View v) {
 
         if(v.getId() == R.id.btn_open) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+
+            // Load the saved IP
+            String savedIP = Preferences.loadText(this, Constants.IP_ADDRESS);
+            String savedPort = Preferences.loadText(this, Constants.PORT);
+            SocketConnection.initSocket(savedIP, savedPort);
+
+            // If the IP has been successfully loaded, then continue to the MainActivity
+            if(SocketConnection.getInstance() != null) {
+                SocketConnection.connect(); // Connect to Server
+
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            }
         }
         else if(v.getId() == R.id.btn_save) {
             saveText();

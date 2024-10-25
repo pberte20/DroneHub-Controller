@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,46 +18,7 @@
       android:layout_height="wrap_content"
       android:orientation="horizontal"
       android:layout_alignParentBottom="true"
-         android:id="@+id/linearLayout">
-    <Button
-        android:id="@+id/btn_capture"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:layout_height="wrap_content"
-        android:text="Capture" 
-        android:textSize="12sp"/>
-
-    <ToggleButton
-        android:id="@+id/btn_record"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Start Record"
-        android:textOff="Start Record"
-        android:textOn="Stop Record"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:textSize="12dp"
-        android:checked="false" />
-     
-    <Button
-        android:id="@+id/btn_shoot_photo_mode"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="Shoot Photo Mode"
-        android:textSize="12sp"/>
-
-    <Button
-        android:id="@+id/btn_record_video_mode"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Record Video Mode"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical" />
-
-     </LinearLayout>
+         android:id="@+id/linearLayout"/>
 
     <TextView
         android:id="@+id/timer"
@@ -69,5 +31,26 @@
         android:textColor="#ffffff"
         android:layout_alignTop="@+id/video_previewer_surface"
         android:layout_centerHorizontal="true" />
+
+    <ImageButton
+        android:id="@+id/btn_event"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentEnd="true"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/btn_draw_end" />
+
+    <ImageButton
+        android:id="@+id/btn_video"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/btn_event"
+        app:srcCompat="@android:drawable/presence_video_busy" />
 
 </RelativeLayout>

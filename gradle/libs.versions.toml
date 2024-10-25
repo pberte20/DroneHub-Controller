@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.0"
+agp = "8.7.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -8,6 +8,8 @@ material = "1.10.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
 djiSdk = "4.17"
+socket = "2.0.1"
+webrtc = "1.2.2"
 
 
 [libraries]
@@ -20,6 +22,8 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 dji-sdk = { group = "com.dji", name = "dji-sdk", version.ref = "djiSdk" }
 dji-sdk-provided = { group = "com.dji", name = "dji-sdk-provided", version.ref = "djiSdk" }
+socket-io-client = { group = "io.socket", name = "socket.io-client", version.ref = "socket"}
+stream-webrtc = { group = "io.getstream", name = "stream-webrtc-android", version.ref = "webrtc"}
 
 
 [plugins]

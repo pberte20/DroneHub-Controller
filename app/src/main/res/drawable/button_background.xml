@@ -1,0 +1,7 @@
+<!-- res/drawable/button_background.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_enabled="false" android:drawable="@color/colorGrey"  /> <!-- Disabled state -->
+    <item android:state_pressed="true" android:drawable="@color/colorPrimary" /> <!-- Pressed state -->
+    <item android:drawable="@drawable/rounded_button_background" /> <!-- Default state -->
+</selector>

@@ -11,6 +11,7 @@ import android.view.View.OnClickListener;
 import android.view.TextureView.SurfaceTextureListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -36,9 +37,8 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     protected DJICodecManager mCodecManager = null;
 
     protected TextureView mVideoSurface = null;
-    private Button mCaptureBtn, mShootPhotoModeBtn, mRecordVideoModeBtn;
-    private ToggleButton mRecordBtn;
-    private TextView recordingTime;
+    protected ImageButton mBtnEvent;
+    protected ImageButton mBtnVideo;
 
     private Handler handler;
 
@@ -47,6 +47,8 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         handler = new Handler();
 
@@ -83,18 +85,6 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
                             @Override
                             public void run() {
-
-                                recordingTime.setText(timeString);
-
-                                /*
-                                 * Update recordingTime TextView visibility and mRecordBtn's check state
-                                 */
-                                if (isVideoRecording){
-                                    recordingTime.setVisibility(View.VISIBLE);
-                                }else
-                                {
-                                    recordingTime.setVisibility(View.INVISIBLE);
-                                }
                             }
                         });
                     }
@@ -107,23 +97,6 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
     protected void onProductChange() {
         initPreviewer();
-        loginAccount();
-    }
-
-    private void loginAccount(){
-
-        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
-                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
-                    @Override
-                    public void onSuccess(final UserAccountState userAccountState) {
-                        Log.e(TAG, "Login Success");
-                    }
-                    @Override
-                    public void onFailure(DJIError error) {
-                        showToast("Login Error:"
-                                + error.getDescription());
-                    }
-                });
     }
 
     @Override
@@ -164,36 +137,20 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     }
 
     private void initUI() {
-        // init mVideoSurface
-        mVideoSurface = (TextureView)findViewById(R.id.video_previewer_surface);
 
-        recordingTime = (TextView) findViewById(R.id.timer);
-        mCaptureBtn = (Button) findViewById(R.id.btn_capture);
-        mRecordBtn = (ToggleButton) findViewById(R.id.btn_record);
-        mShootPhotoModeBtn = (Button) findViewById(R.id.btn_shoot_photo_mode);
-        mRecordVideoModeBtn = (Button) findViewById(R.id.btn_record_video_mode);
+        // Init buttons
+        mBtnEvent = findViewById(R.id.btn_event);
+        mBtnEvent.setOnClickListener(this);
+
+        mBtnVideo = findViewById(R.id.btn_video);
+        mBtnVideo.setOnClickListener(this);
+
+        // init mVideoSurface
+        mVideoSurface = findViewById(R.id.video_previewer_surface);
 
         if (null != mVideoSurface) {
             mVideoSurface.setSurfaceTextureListener(this);
         }
-
-        mCaptureBtn.setOnClickListener(this);
-        mRecordBtn.setOnClickListener(this);
-        mShootPhotoModeBtn.setOnClickListener(this);
-        mRecordVideoModeBtn.setOnClickListener(this);
-
-        recordingTime.setVisibility(View.INVISIBLE);
-
-        mRecordBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    startRecord();
-                } else {
-                    stopRecord();
-                }
-            }
-        });
     }
 
     private void initPreviewer() {
@@ -258,116 +215,8 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
 
     @Override
     public void onClick(View v) {
-    }
+        if(v.getId() == R.id.btn_event) {
 
-    private void switchCameraFlatMode(SettingsDefinitions.FlatCameraMode flatCameraMode){
-        Camera camera = ControllerApplication.getCameraInstance();
-        if (camera != null) {
-            camera.setFlatMode(flatCameraMode, error -> {
-                if (error == null) {
-                    showToast("Switch Camera Flat Mode Succeeded");
-                } else {
-                    showToast(error.getDescription());
-                }
-            });
         }
-    }
-
-    private void switchCameraMode(SettingsDefinitions.CameraMode cameraMode){
-        Camera camera = ControllerApplication.getCameraInstance();
-        if (camera != null) {
-            camera.setMode(cameraMode, error -> {
-                if (error == null) {
-                    showToast("Switch Camera Mode Succeeded");
-                } else {
-                    showToast(error.getDescription());
-                }
-            });
-        }
-    }
-
-    // Method for taking photo
-    private void captureAction(){
-        final Camera camera = ControllerApplication.getCameraInstance();
-        if (camera != null) {
-            if (isMavicAir2() || isM300()) {
-                camera.setFlatMode(SettingsDefinitions.FlatCameraMode.PHOTO_SINGLE, djiError -> {
-                    if (null == djiError) {
-                        takePhoto();
-                    }
-                });
-            }else {
-                camera.setShootPhotoMode(SettingsDefinitions.ShootPhotoMode.SINGLE, djiError -> {
-                    if (null == djiError) {
-                        takePhoto();
-                    }
-                });
-            }
-        }
-    }
-
-    private void takePhoto(){
-        final Camera camera = ControllerApplication.getCameraInstance();
-        if (camera == null){
-            return;
-        }
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                camera.startShootPhoto(djiError -> {
-                    if (djiError == null) {
-                        showToast("take photo: success");
-                    } else {
-                        showToast(djiError.getDescription());
-                    }
-                });
-            }
-        }, 2000);
-    }
-
-    // Method for starting recording
-    private void startRecord(){
-
-        final Camera camera = ControllerApplication.getCameraInstance();
-        if (camera != null) {
-            camera.startRecordVideo(djiError -> {
-                if (djiError == null) {
-                    showToast("Record video: success");
-                }else {
-                    showToast(djiError.getDescription());
-                }
-            }); // Execute the startRecordVideo API
-        }
-    }
-
-    // Method for stopping recording
-    private void stopRecord(){
-
-        Camera camera = ControllerApplication.getCameraInstance();
-        if (camera != null) {
-            camera.stopRecordVideo(djiError -> {
-                if(djiError == null) {
-                    showToast("Stop recording: success");
-                }else {
-                    showToast(djiError.getDescription());
-                }
-            }); // Execute the stopRecordVideo API
-        }
-    }
-
-    private boolean isMavicAir2(){
-        BaseProduct baseProduct = ControllerApplication.getProductInstance();
-        if (baseProduct != null) {
-            return baseProduct.getModel() == Model.MAVIC_AIR_2;
-        }
-        return false;
-    }
-
-    private boolean isM300(){
-        BaseProduct baseProduct = ControllerApplication.getProductInstance();
-        if (baseProduct != null) {
-            return baseProduct.getModel() == Model.MATRICE_300_RTK;
-        }
-        return false;
     }
 }

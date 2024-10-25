@@ -20,6 +20,7 @@ public class MApplication extends Application {
 
     @Override
     public void onCreate() {
+        setTheme(R.style.Theme_HERDController);
         super.onCreate();
         controllerApplication.onCreate();
     }
