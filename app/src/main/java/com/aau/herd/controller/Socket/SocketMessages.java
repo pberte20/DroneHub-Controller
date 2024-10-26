@@ -19,22 +19,22 @@ public class SocketMessages {
         return eventJSON;
     }
 
-    public static JSONObject droneStateMessage(DroneState drone) throws JSONException {
+    public static JSONObject droneStateMessage(DroneState droneState) throws JSONException {
         // Create JSON coordinates
         JSONObject dronePosJSON = new JSONObject();
-        dronePosJSON.put("lat", drone.getPos().getLat());
-        dronePosJSON.put("lng", drone.getPos().getLng());
+        dronePosJSON.put("lat", droneState.getPos().getLat());
+        dronePosJSON.put("lng", droneState.getPos().getLng());
 
         // Create JSON object
         JSONObject droneInfo = new JSONObject();
 
-        droneInfo.put("id", drone.getId());
-        droneInfo.put("name", drone.getName());
-        droneInfo.put("version", drone.getModel());
-        droneInfo.put("battery", drone.getBattery());
+        droneInfo.put("id", droneState.getId());
+        droneInfo.put("name", droneState.getName());
+        droneInfo.put("version", droneState.getModel());
+        droneInfo.put("battery", droneState.getBattery());
         droneInfo.put("position", dronePosJSON);
-        droneInfo.put("altitude", drone.getPos().getAlt());
-        droneInfo.put("yaw", drone.getYaw());
+        droneInfo.put("altitude", droneState.getPos().getAlt());
+        droneInfo.put("yaw", droneState.getYaw());
 
         return droneInfo;
     }

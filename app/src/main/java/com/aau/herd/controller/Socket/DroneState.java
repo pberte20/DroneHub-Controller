@@ -11,6 +11,7 @@ public class DroneState {
     private Position pos;
     private double yaw;
     private int battery;
+    private String color;
     private boolean isReturning;
     private boolean isOnMission;
     private boolean isOnWaypointMission;
@@ -23,6 +24,7 @@ public class DroneState {
         this.pos = new Position(0,0,0);
         this.yaw = 0;
         this.battery = 0;
+        this.color = "#FF8D00"; // Need to listen to server for the color
         this.isOnMission = false;
         this.isReturning = false;
         this.isOnWaypointMission = false;

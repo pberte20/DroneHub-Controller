@@ -1,56 +1,55 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-    
+    android:layout_height="match_parent">
+
     <TextureView
         android:id="@+id/video_previewer_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/linearLayout" />
-    
-     <LinearLayout 
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      android:layout_alignParentBottom="true"
-         android:id="@+id/linearLayout"/>
+        android:layout_above="@+id/linearLayout"
+        />
 
-    <TextView
-        android:id="@+id/timer"
-        android:layout_width="150dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginTop="23dp"
-        android:gravity="center"
-        android:textColor="#ffffff"
-        android:layout_alignTop="@+id/video_previewer_surface"
-        android:layout_centerHorizontal="true" />
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/colorBlack"
+        android:padding="10dp"
+        android:alpha=".5"
+        android:gravity="bottom"
+        >
 
-    <ImageButton
-        android:id="@+id/btn_event"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_alignParentEnd="true"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:srcCompat="@drawable/btn_draw_end" />
+        <ImageButton
+            android:id="@+id/btn_event"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:background="@color/zxing_transparent"
+            android:layout_marginBottom="30dp"
+            app:srcCompat="@drawable/ic_event"
+            app:tint="@color/colorWhite"
+            />
 
-    <ImageButton
-        android:id="@+id/btn_video"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/btn_event"
-        app:srcCompat="@android:drawable/presence_video_busy" />
+        <ImageButton
+            android:id="@+id/btn_video_cast"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:background="@color/zxing_transparent"
+            app:srcCompat="@drawable/ic_video_cast"
+            app:tint="@color/colorWhite"
+            />
 
-</RelativeLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

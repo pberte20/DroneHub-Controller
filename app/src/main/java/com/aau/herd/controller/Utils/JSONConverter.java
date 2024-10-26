@@ -12,23 +12,6 @@ import java.util.Queue;
 
 public class JSONConverter {
 
-    public static boolean convertReturnMessage(DroneState drone){
-        boolean returnHome = false;
-
-        try{
-            String jsonString = SocketConnection.getReturnMessage().toString();
-            JSONObject jsonObject = new JSONObject(jsonString);
-
-            if(jsonObject.getString("targetDroneId").equals(drone.getId())){
-                returnHome = jsonObject.getBoolean("return");
-            }
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
-
-        return returnHome;
-    }
-
     public static boolean convertStopMessage(DroneState drone) {
         boolean stop = false;
 
@@ -44,27 +27,6 @@ public class JSONConverter {
         }
 
         return stop;
-    }
-
-    public static Position convertGoToMessage(DroneState drone){
-
-        try{
-            String jsonString = SocketConnection.getGoToMessage().toString();
-            JSONObject jsonObject = new JSONObject(jsonString);
-
-            if(jsonObject.getString("targetDroneId").equals(drone.getId())){
-
-                double lat = jsonObject.getJSONObject("location").getDouble("lat");
-                double lng = jsonObject.getJSONObject("location").getDouble("lng");
-                double alt = (float) jsonObject.getDouble("altitude");
-                double speed = (float) jsonObject.getDouble("speed");
-
-                return new Position(lat, lng, alt, speed);
-            }
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static Queue<Position> convertWaypointMessage(DroneState drone){

@@ -1,58 +1,48 @@
 package com.aau.herd.controller;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
-import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.TextureView.SurfaceTextureListener;
-import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
+import androidx.appcompat.app.AppCompatActivity;
 
-import dji.common.camera.SettingsDefinitions;
-import dji.common.camera.SystemState;
-import dji.common.error.DJIError;
+import com.aau.herd.controller.VideoStreaming.DJIStreamer;
+
 import dji.common.product.Model;
-import dji.common.useraccount.UserAccountState;
-import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
-import dji.sdk.useraccount.UserAccountManager;
 
-public class MainActivity extends Activity implements SurfaceTextureListener,OnClickListener{
+public class MainActivity extends AppCompatActivity implements SurfaceTextureListener,OnClickListener{
 
     private static final String TAG = MainActivity.class.getName();
+    private DroneController droneController;
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
-
-    // Codec for video live view
     protected DJICodecManager mCodecManager = null;
-
     protected TextureView mVideoSurface = null;
     protected ImageButton mBtnEvent;
     protected ImageButton mBtnVideo;
-
-    private Handler handler;
-
+    private DJIStreamer djiStreamer;
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
-        handler = new Handler();
-
         initUI();
+
+        String id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        droneController = new DroneController(this, id);
 
         // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataListener = new VideoFeeder.VideoDataListener() {
@@ -64,35 +54,6 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
                 }
             }
         };
-
-        Camera camera = ControllerApplication.getCameraInstance();
-
-        if (camera != null) {
-
-            camera.setSystemStateCallback(new SystemState.Callback() {
-                @Override
-                public void onUpdate(SystemState cameraSystemState) {
-                    if (null != cameraSystemState) {
-
-                        int recordTime = cameraSystemState.getCurrentVideoRecordingTimeInSeconds();
-                        int minutes = (recordTime % 3600) / 60;
-                        int seconds = recordTime % 60;
-
-                        final String timeString = String.format("%02d:%02d", minutes, seconds);
-                        final boolean isVideoRecording = cameraSystemState.isRecording();
-
-                        MainActivity.this.runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                            }
-                        });
-                    }
-                }
-            });
-
-        }
-
     }
 
     protected void onProductChange() {
@@ -142,7 +103,7 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         mBtnEvent = findViewById(R.id.btn_event);
         mBtnEvent.setOnClickListener(this);
 
-        mBtnVideo = findViewById(R.id.btn_video);
+        mBtnVideo = findViewById(R.id.btn_video_cast);
         mBtnVideo.setOnClickListener(this);
 
         // init mVideoSurface
@@ -205,6 +166,31 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
     }
 
+    @Override
+    public void onClick(View v) {
+        // Event Button
+        if(v.getId() == R.id.btn_event) {
+            String content = "A drone has detected an object, please investigate the site.";
+            String type = "Detected Object";
+            droneController.sendDroneEventMessage(content, type);
+        }
+        // Video Stream Button
+        else if (v.getId() == R.id.btn_video_cast) {
+            if(djiStreamer == null) {
+                djiStreamer = new DJIStreamer(this);
+                mBtnVideo.setColorFilter(Color.GREEN);
+
+                showToast("Video Stream Enabled");
+            }
+            else {
+                djiStreamer = null;
+                mBtnVideo.setColorFilter(Color.WHITE);
+
+                showToast("Video Stream Disabled");
+            }
+        }
+    }
+
     public void showToast(final String msg) {
         runOnUiThread(new Runnable() {
             public void run() {
@@ -213,10 +199,4 @@ public class MainActivity extends Activity implements SurfaceTextureListener,OnC
         });
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.btn_event) {
-
-        }
-    }
 }

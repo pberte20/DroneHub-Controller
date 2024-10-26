@@ -16,14 +16,8 @@ public class SocketConnection {
 
     private static Socket socketConnection;
 
-    private static boolean goToMessageReceived = false;
-    private static Object goToMessage;
-
     private static boolean waypointMessageReceived = false;
     private static Object waypointMessage;
-
-    private static boolean returnToHomeReceived = false;
-    private static Object returnMessage = false;
 
     private static boolean stopMessageReceived = false;
     private static Object stopMessage = false;
@@ -40,13 +34,11 @@ public class SocketConnection {
 
     public static void connect(){
         socketConnection.on(EVENT_CONNECT, args -> {
-            System.out.println("Socket connected: " + socketConnection.connected()); // true
+            System.out.println("Socket connected: " + socketConnection.connected());
         });
         socketConnection.connect();
 
         // Listen to the individual sockets
-        SocketConnection.listen(Constants.DRONE_GOTO_LOCATION);
-        SocketConnection.listen(Constants.DRONE_RTH);
         SocketConnection.listen(Constants.DRONE_STOP);
         SocketConnection.listen(Constants.DRONE_WAYPOINT_MISSION);
     }
@@ -61,14 +53,6 @@ public class SocketConnection {
             @Override
             public void call(Object... args) {
                 switch (event) {
-                    case Constants.DRONE_GOTO_LOCATION:
-                        goToMessageReceived = true;
-                        goToMessage = args[0];
-                        break;
-                    case Constants.DRONE_RTH:
-                        returnToHomeReceived = true;
-                        returnMessage = args[0];
-                        break;
                     case Constants.DRONE_STOP:
                         stopMessageReceived = true;
                         stopMessage = args[0];
@@ -101,28 +85,12 @@ public class SocketConnection {
         }
     }
 
-    public static boolean isGoToMessageReceived() {
-        return goToMessageReceived;
-    }
-
-    public static void setGoToMessageReceived(boolean goToMessageReceived) {
-        SocketConnection.goToMessageReceived = goToMessageReceived;
-    }
-
     public static boolean isWaypointMessageReceived() {
         return waypointMessageReceived;
     }
 
     public static void setWaypointMessageReceived(boolean waypointMessageReceived) {
         SocketConnection.waypointMessageReceived = waypointMessageReceived;
-    }
-
-    public static boolean isReturnToHomeReceived() {
-        return returnToHomeReceived;
-    }
-
-    public static void setReturnToHomeReceived(boolean returnToHomeReceived) {
-        SocketConnection.returnToHomeReceived = returnToHomeReceived;
     }
 
     public static boolean isStopMessageReceived() {
@@ -134,14 +102,8 @@ public class SocketConnection {
     }
 
     // Getters
-    public static Object getGoToMessage() {
-        return goToMessage;
-    }
     public static Object getWaypointMessage() {
         return waypointMessage;
-    }
-    public static Object getReturnMessage() {
-        return returnMessage;
     }
     public static Object getStopMessage() {
         return stopMessage;
