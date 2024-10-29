@@ -68,7 +68,7 @@ dependencies {
     implementation(libs.dji.sdk)
     compileOnly(libs.dji.sdk.provided)
 
-    implementation(libs.socket.io.client){
+    implementation(libs.socket.io.client) {
         exclude(group = "org.json", module = "json")
     }
 

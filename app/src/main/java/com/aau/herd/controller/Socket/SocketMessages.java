@@ -3,6 +3,8 @@ package com.aau.herd.controller.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Random;
+
 public class SocketMessages {
     public static JSONObject eventMessage(Event event) throws JSONException {
         JSONObject posJSON = new JSONObject();
@@ -11,6 +13,8 @@ public class SocketMessages {
 
         JSONObject eventJSON = new JSONObject();
 
+        int random = new Random().nextInt(1000000) + 1;
+        eventJSON.put("eventID", event.getDroneState().getId() + random);
         eventJSON.put("droneID", event.getDroneState().getId());
         eventJSON.put("position", posJSON);
         eventJSON.put("content", event.getContent());

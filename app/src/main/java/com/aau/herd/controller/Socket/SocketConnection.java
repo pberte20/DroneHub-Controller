@@ -79,7 +79,7 @@ public class SocketConnection {
         try {
             JSONObject eventJSON = SocketMessages.eventMessage(event);
 
-            socketConnection.emit(Constants.EVENT, eventJSON.toString());
+            socketConnection.emit(Constants.EVENT, eventJSON);
         } catch (JSONException e) {
             e.printStackTrace();
         }
