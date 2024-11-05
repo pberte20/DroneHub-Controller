@@ -3,11 +3,13 @@ package com.aau.herd.controller;
 import static com.aau.herd.controller.ControllerApplication.getProductInstance;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.aau.herd.controller.Listeners.ColorStateListener;
 import com.aau.herd.controller.Socket.DroneState;
 import com.aau.herd.controller.Socket.Event;
 import com.aau.herd.controller.Socket.SocketConnection;
@@ -16,6 +18,9 @@ import com.aau.herd.controller.Utils.Constants;
 import com.aau.herd.controller.Utils.JSONConverter;
 import com.aau.herd.controller.Utils.Position;
 import com.aau.herd.controller.Utils.Trigonometry;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Queue;
 
@@ -37,6 +42,7 @@ import dji.sdk.remotecontroller.RemoteController;
 
 public class DroneController extends AppCompatActivity {
     private BatteryStateListener batteryStateListener;
+    private ColorStateListener colorStateListener;
     private Context context;
     private Handler handler = new Handler();
     // DJI Variables
@@ -184,6 +190,24 @@ public class DroneController extends AppCompatActivity {
         // Check if a stop message has been received
         if(SocketConnection.isStopMessageReceived()){
             performStopMission();
+        }
+
+        // Server has send a designated drone color
+        if(SocketConnection.isColorMessageReceived()){
+            try{
+                String jsonString = SocketConnection.getColorMessage().toString();
+                JSONObject jsonObject = new JSONObject(jsonString);
+
+                SocketConnection.setColorMessageReceived(false);
+                String color = jsonObject.getString("droneColor");
+
+                if(colorStateListener != null) {
+                    colorStateListener.onColorStateChanged(color);
+                }
+
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
         }
 
         // Get the state of the physical device buttons
@@ -375,5 +399,9 @@ public class DroneController extends AppCompatActivity {
 
     public void setBatteryStateListener(BatteryStateListener listener) {
         this.batteryStateListener = listener;
+    }
+
+    public void setColorStateListenter(ColorStateListener listener) {
+        this.colorStateListener = listener;
     }
 }

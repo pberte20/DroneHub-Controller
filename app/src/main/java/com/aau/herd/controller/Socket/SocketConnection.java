@@ -21,6 +21,9 @@ public class SocketConnection {
 
     private static boolean stopMessageReceived = false;
     private static Object stopMessage = false;
+    private static boolean colorMessageReceived = false;
+
+    private static Object colorMessage = false;
 
     public static void initSocket(String ip, String port) {
         try{
@@ -41,6 +44,7 @@ public class SocketConnection {
         // Listen to the individual sockets
         SocketConnection.listen(Constants.DRONE_STOP);
         SocketConnection.listen(Constants.DRONE_WAYPOINT_MISSION);
+        SocketConnection.listen(Constants.DRONE_CONTROLLER_COLOR);
     }
 
     public static void emit(String label, Object message){
@@ -60,6 +64,10 @@ public class SocketConnection {
                     case Constants.DRONE_WAYPOINT_MISSION:
                         waypointMessageReceived = true;
                         waypointMessage = args[0];
+                        break;
+                    case Constants.DRONE_CONTROLLER_COLOR:
+                        colorMessageReceived = true;
+                        colorMessage = args[0];
                         break;
                 }
             }
@@ -101,12 +109,24 @@ public class SocketConnection {
         SocketConnection.stopMessageReceived = stopMessageReceived;
     }
 
+    public static boolean isColorMessageReceived() {
+        return colorMessageReceived;
+    }
+
+    public static void setColorMessageReceived(boolean colorMessageReceived) {
+        SocketConnection.colorMessageReceived = colorMessageReceived;
+    }
+
     // Getters
     public static Object getWaypointMessage() {
         return waypointMessage;
     }
     public static Object getStopMessage() {
         return stopMessage;
+    }
+
+    public static Object getColorMessage() {
+        return colorMessage;
     }
 
     public static Socket getInstance() {

@@ -3,6 +3,7 @@ package com.aau.herd.controller;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -11,12 +12,15 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.TextureView.SurfaceTextureListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aau.herd.controller.Listeners.BatteryStateListener;
+import com.aau.herd.controller.Listeners.ColorStateListener;
 import com.aau.herd.controller.VideoStreaming.DJIStreamer;
 
 import java.util.concurrent.Executors;
@@ -29,7 +33,7 @@ import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 
-public class MainActivity extends AppCompatActivity implements SurfaceTextureListener,OnClickListener, BatteryStateListener {
+public class MainActivity extends AppCompatActivity implements SurfaceTextureListener,OnClickListener, BatteryStateListener, ColorStateListener {
 
     private static final String TAG = MainActivity.class.getName();
     private DroneController droneController;
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
         String id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         droneController = new DroneController(this, id);
         droneController.setBatteryStateListener(this);
+        droneController.setColorStateListenter(this);
 
         // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataListener = new VideoFeeder.VideoDataListener() {
@@ -232,6 +237,18 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
         // Update the TextView with the new battery percentage
         String batteryText = percentage + "%";
         runOnUiThread(() -> mTextBattery.setText(batteryText));
+    }
+
+    public void onColorStateChanged(String color) {
+        runOnUiThread(() -> changeStatusBarColor(color));
+    }
+
+    private void changeStatusBarColor(String color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.parseColor(color));
+        }
     }
 
     public void showToast(final String msg) {

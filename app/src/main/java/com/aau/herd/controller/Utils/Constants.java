@@ -8,6 +8,7 @@ public class Constants {
     public static final String DRONE_RTH = "drone-rth";
     public static final String DRONE_STOP = "drone-stop";
     public static final String DRONE_WAYPOINT_MISSION = "drone-waypoint";
+    public static final String DRONE_CONTROLLER_COLOR = "drone-controller-color";
     public static final String IP_ADDRESS = "ip-address";
     public static final String PORT = "port";
 }
