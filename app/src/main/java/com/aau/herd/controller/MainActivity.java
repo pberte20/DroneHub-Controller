@@ -21,6 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.aau.herd.controller.Listeners.BatteryStateListener;
 import com.aau.herd.controller.Listeners.ColorStateListener;
+import com.aau.herd.controller.Listeners.DroneStateListener;
+import com.aau.herd.controller.Socket.DroneState;
 import com.aau.herd.controller.VideoStreaming.DJIStreamer;
 
 import java.util.concurrent.Executors;
@@ -33,17 +35,18 @@ import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 
-public class MainActivity extends AppCompatActivity implements SurfaceTextureListener,OnClickListener, BatteryStateListener, ColorStateListener {
+public class MainActivity extends AppCompatActivity implements SurfaceTextureListener,OnClickListener, BatteryStateListener, ColorStateListener, DroneStateListener {
 
     private static final String TAG = MainActivity.class.getName();
     private DroneController droneController;
-    protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
-    protected DJICodecManager mCodecManager = null;
-    protected TextureView mVideoSurface = null;
-    protected ImageButton mBtnLocate;
-    protected ImageButton mBtnEvent;
-    protected ImageButton mBtnVideo;
-    protected TextView mTextBattery;
+    private VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
+    private DJICodecManager mCodecManager = null;
+    private TextureView mVideoSurface = null;
+    private ImageButton mBtnLocate;
+    private ImageButton mBtnEvent;
+    private ImageButton mBtnVideo;
+    private TextView mTextBattery;
+    private TextView mTextAltitude;
     private DJIStreamer djiStreamer;
 
     private boolean lightsFlashing = false;
@@ -61,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
         droneController = new DroneController(this, id);
         droneController.setBatteryStateListener(this);
         droneController.setColorStateListenter(this);
+        droneController.setDroneStateListener(this);
 
         // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataListener = new VideoFeeder.VideoDataListener() {
@@ -129,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
 
         // Init Telemetry Text
         mTextBattery = findViewById(R.id.text_battery_level);
+        mTextAltitude = findViewById(R.id.text_altitude);
 
         // init mVideoSurface
         mVideoSurface = findViewById(R.id.video_previewer_surface);
@@ -241,6 +246,16 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
 
     public void onColorStateChanged(String color) {
         runOnUiThread(() -> changeStatusBarColor(color));
+    }
+
+    @Override
+    public void onDroneStateChanged(DroneState droneState) {
+        runOnUiThread(() -> {
+
+            // Altitude
+            String altitudeText = "H " + Math.round(droneState.getPos().getAlt()) + " m";
+            mTextAltitude.setText(altitudeText);
+        });
     }
 
     private void changeStatusBarColor(String color) {

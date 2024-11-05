@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aau.herd.controller.Listeners.ColorStateListener;
+import com.aau.herd.controller.Listeners.DroneStateListener;
 import com.aau.herd.controller.Socket.DroneState;
 import com.aau.herd.controller.Socket.Event;
 import com.aau.herd.controller.Socket.SocketConnection;
@@ -43,6 +44,7 @@ import dji.sdk.remotecontroller.RemoteController;
 public class DroneController extends AppCompatActivity {
     private BatteryStateListener batteryStateListener;
     private ColorStateListener colorStateListener;
+    private DroneStateListener droneStateListener;
     private Context context;
     private Handler handler = new Handler();
     // DJI Variables
@@ -174,6 +176,10 @@ public class DroneController extends AppCompatActivity {
                 droneState.setYaw(currentState.getAttitude().yaw);
                 droneState.setFlightMode(currentState.getFlightModeString());
                 droneState.setReturning(currentState.isGoingHome());
+
+                if(droneStateListener != null) {
+                    droneStateListener.onDroneStateChanged(droneState);
+                }
 
                 updateDroneState(); //Continuously send the drone state to the server
             });
@@ -403,5 +409,9 @@ public class DroneController extends AppCompatActivity {
 
     public void setColorStateListenter(ColorStateListener listener) {
         this.colorStateListener = listener;
+    }
+
+    public void setDroneStateListener(DroneStateListener listener) {
+        this.droneStateListener = listener;
     }
 }
