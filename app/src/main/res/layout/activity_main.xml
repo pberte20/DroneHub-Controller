@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,6 +29,18 @@
         >
 
         <ImageButton
+            android:id="@+id/btn_locate"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:background="@color/zxing_transparent"
+            android:layout_marginBottom="30dp"
+            app:srcCompat="@drawable/ic_location_crosshairs_solid"
+            app:tint="@color/colorWhite"
+            />
+
+        <ImageButton
             android:id="@+id/btn_event"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -51,5 +64,40 @@
             />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:alpha=".5"
+        android:background="@color/colorBlack"
+
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_battery_full_solid"
+            app:tint="@color/colorWhite" />
+
+        <TextView
+            android:id="@+id/text_battery_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="100%"
+            android:textColor="@color/colorWhite"
+            tools:layout_editor_absoluteX="13dp"
+            tools:layout_editor_absoluteY="376dp" />
+
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

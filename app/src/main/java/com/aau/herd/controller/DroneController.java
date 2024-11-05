@@ -2,13 +2,16 @@ package com.aau.herd.controller;
 
 import static com.aau.herd.controller.ControllerApplication.getProductInstance;
 
-import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.aau.herd.controller.Socket.DroneState;
 import com.aau.herd.controller.Socket.Event;
 import com.aau.herd.controller.Socket.SocketConnection;
+import com.aau.herd.controller.Listeners.BatteryStateListener;
 import com.aau.herd.controller.Utils.Constants;
 import com.aau.herd.controller.Utils.JSONConverter;
 import com.aau.herd.controller.Utils.Position;
@@ -17,20 +20,25 @@ import com.aau.herd.controller.Utils.Trigonometry;
 import java.util.Queue;
 
 import dji.common.Stick;
+import dji.common.error.DJIError;
+import dji.common.flightcontroller.LEDsSettings;
 import dji.common.flightcontroller.virtualstick.FlightControlData;
 import dji.common.flightcontroller.virtualstick.FlightCoordinateSystem;
 import dji.common.flightcontroller.virtualstick.RollPitchControlMode;
 import dji.common.flightcontroller.virtualstick.VerticalControlMode;
 import dji.common.flightcontroller.virtualstick.YawControlMode;
 import dji.common.remotecontroller.HardwareState;
+import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.battery.Battery;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.products.Aircraft;
 import dji.sdk.remotecontroller.RemoteController;
 
-public class DroneController extends Activity {
-    Context context;
+public class DroneController extends AppCompatActivity {
+    private BatteryStateListener batteryStateListener;
+    private Context context;
+    private Handler handler = new Handler();
     // DJI Variables
     private FlightController flightController;
     private FlightControlData flightControlData;
@@ -42,6 +50,7 @@ public class DroneController extends Activity {
     // Drone Variables
     private Position goToTarget;
     private Queue<Position> waypointTargets;
+    private boolean lightsOn = false;
 
     private DroneState droneState;
 
@@ -55,6 +64,7 @@ public class DroneController extends Activity {
         this.droneState = new DroneState(id);
 
         initBattery();
+        initModel();
         initFlightController();
         initRemoteController();
         initVirtualStick();
@@ -67,6 +77,29 @@ public class DroneController extends Activity {
             }
         }
         getBattery();
+    }
+
+    private void initModel() {
+        BaseProduct product = getProductInstance();
+        if (product != null && product.isConnected()) {
+            if (product instanceof Aircraft) {
+                String model = product.getModel().name();
+                droneState.setModel(model);
+
+                product.getName(new CommonCallbacks.CompletionCallbackWith<String>() {
+                        @Override
+                        public void onSuccess(String name) {
+                            droneState.setName(name);
+                        }
+
+                        @Override
+                        public void onFailure(DJIError djiError) {
+                            showToast(djiError.getDescription());
+                        }
+                    }
+                );
+            }
+        }
     }
 
     private void initFlightController() {
@@ -112,11 +145,14 @@ public class DroneController extends Activity {
         flightControlData.setYaw((float) droneState.getYaw());
         flightControlData.setVerticalThrottle((float) droneState.getPos().getAlt());
     }
-    private void getBattery(){
+    public void getBattery(){
         if (battery != null) {
             battery.setStateCallback(batteryState -> {
                 int currPercentage = batteryState.getChargeRemainingInPercent();
                 droneState.setBattery(currPercentage);
+                if (batteryStateListener != null) {
+                    batteryStateListener.onBatteryStateChanged(currPercentage);
+                }
             });
         }
     }
@@ -278,11 +314,66 @@ public class DroneController extends Activity {
             }
         }
     }
+
+    private Runnable flashLightsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(flightController != null){
+                lightsOn = !lightsOn;
+
+                LEDsSettings.Builder builder = new LEDsSettings.Builder();
+                builder.statusIndicatorOn(lightsOn);
+
+                LEDsSettings settings = builder.build();
+
+                flightController.setLEDsEnabledSettings(settings, new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError != null) {
+                            showToast(djiError.getDescription());
+                        }
+                    }
+                });
+            }
+            // Schedule next toggle
+            handler.postDelayed(flashLightsRunnable, 500);
+        }
+    };
+
+    public void startFlashingLights() {
+        handler.post(flashLightsRunnable);
+    }
+
+    public void stopFlashingLights() {
+        handler.removeCallbacks(flashLightsRunnable);
+        // Ensure lights are turned off
+        if (flightController != null) {
+
+            LEDsSettings.Builder builder = new LEDsSettings.Builder();
+            builder.statusIndicatorOn(false);
+
+            LEDsSettings settings = builder.build();
+
+            flightController.setLEDsEnabledSettings(settings, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if (djiError != null) {
+                        showToast(djiError.getDescription());
+                    }
+                }
+            });
+        }
+    }
+
     public void showToast(final String msg) {
         runOnUiThread(new Runnable() {
             public void run() {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void setBatteryStateListener(BatteryStateListener listener) {
+        this.batteryStateListener = listener;
     }
 }

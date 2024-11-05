@@ -18,7 +18,7 @@ public class DroneState {
 
     public DroneState(String id) {
         this.id = id;
-        this.name = "Search drone";
+        this.name = "Unknown";
         this.model = "Unknown";
         this.flightMode = "Undefined";
         this.pos = new Position(0,0,0);
