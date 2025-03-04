@@ -34,7 +34,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HERDController"
+        android:theme="@style/Theme.DroneHub"
         tools:replace="android:theme"
         android:extractNativeLibs="true"
         tools:targetApi="31">
@@ -43,7 +43,7 @@
         <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data
             android:name="com.dji.sdk.API_KEY"
-            android:value="DJI API Key" />
+            android:value="INSERT API KEY" />
         <activity
             android:name="dji.sdk.sdkmanager.DJIAoaControllerActivity"
             android:exported="true"
@@ -69,6 +69,7 @@
         <activity
             android:name=".MainActivity"
         />
+
     </application>
 
 

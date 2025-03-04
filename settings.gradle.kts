@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "HERDController"
+rootProject.name = "DroneHubController"
 include(":app")
