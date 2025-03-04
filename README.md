@@ -28,9 +28,6 @@ This project requires a DJI API key for proper functionality. Follow these steps
 3. Run the app on an emulator or a connected device.
 
 ## Troubleshooting
-- If you encounter issues with the API key not being recognized, ensure that:
-  - `local.properties` contains `API_KEY=your_api_key_here`
-  - The Gradle sync completes successfully
 - If Gradle fails, try running:
   ```sh
   ./gradlew clean
