@@ -10,8 +10,8 @@ public class Event {
         this.droneState = droneState;
         Content = content;
         this.type = type;
-    }
 
+    }
     public DroneState getDroneState() {
         return droneState;
     }

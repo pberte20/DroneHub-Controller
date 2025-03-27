@@ -1,6 +1,7 @@
 package com.aau.herd.controller;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
@@ -25,6 +26,9 @@ import com.aau.herd.controller.Listeners.DroneStateListener;
 import com.aau.herd.controller.Socket.DroneState;
 import com.aau.herd.controller.VideoStreaming.DJIStreamer;
 
+import org.json.JSONException;
+
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -199,9 +203,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
     public void onClick(View v) {
         // Event Button
         if (v.getId() == R.id.btn_event) {
-            String content = "A drone has detected an object, please investigate the site.";
+            String content = "A drone has detected an object, please investigate the site. remaining battery = " + droneController.getBatteryPercent();
             String type = "Detected Object";
             droneController.sendDroneEventMessage(content, type);
+            Bitmap screenshot = getScreenShot();
+            try {
+                droneController.sendScreenshot(screenshot);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
 
             showToast("Event sent to server");
         }
@@ -210,8 +220,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
             if (djiStreamer == null) {
                 djiStreamer = new DJIStreamer(this);
                 mBtnVideo.setColorFilter(Color.GREEN);
-
-                showToast("Video Stream Enabled");
+                //showToast("Video Stream Enabled");
             } else {
                 djiStreamer = null;
                 mBtnVideo.setColorFilter(Color.WHITE);
@@ -246,6 +255,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceTextureLis
 
     public void onColorStateChanged(String color) {
         runOnUiThread(() -> changeStatusBarColor(color));
+    }
+
+    public Bitmap getScreenShot() {
+        TextureView videoTextureView = findViewById(R.id.video_previewer_surface);
+        return videoTextureView.getBitmap();
     }
 
     @Override

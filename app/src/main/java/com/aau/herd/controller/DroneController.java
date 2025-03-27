@@ -3,7 +3,9 @@ package com.aau.herd.controller;
 import static com.aau.herd.controller.ControllerApplication.getProductInstance;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.widget.Toast;
 
@@ -23,6 +25,9 @@ import com.aau.herd.controller.Utils.Trigonometry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.net.Socket;
+import java.util.Base64;
 import java.util.Queue;
 
 import dji.common.Stick;
@@ -85,6 +90,10 @@ public class DroneController extends AppCompatActivity {
             }
         }
         getBattery();
+    }
+
+    public int getBatteryPercent () {
+        return droneState.getBattery();
     }
 
     private void initModel() {
@@ -221,15 +230,18 @@ public class DroneController extends AppCompatActivity {
 
         SocketConnection.sendDroneStateMessage(droneState);
     }
-
     public void sendDroneEventMessage(String content, String type) {
 
         Event event = new Event(droneState, content, type);
         SocketConnection.sendEventMessage(event);
-
         showToast("Event sent to server");
     }
-
+    public void sendScreenshot(Bitmap screenshot) throws JSONException {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        screenshot.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        byte[] image = stream.toByteArray();
+        SocketConnection.emit("screenshots", image);
+    }
     private void performStopMission(){
         boolean stop = JSONConverter.convertStopMessage(droneState);
         if(stop){
@@ -414,4 +426,6 @@ public class DroneController extends AppCompatActivity {
     public void setDroneStateListener(DroneStateListener listener) {
         this.droneStateListener = listener;
     }
+
+
 }

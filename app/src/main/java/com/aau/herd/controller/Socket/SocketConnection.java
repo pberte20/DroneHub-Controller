@@ -92,7 +92,7 @@ public class SocketConnection {
             e.printStackTrace();
         }
     }
-
+    
     public static boolean isWaypointMessageReceived() {
         return waypointMessageReceived;
     }
